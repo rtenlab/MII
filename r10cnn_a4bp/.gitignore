@@ -1,0 +1,7 @@
+r10cnn_apollo4p_evb.uvguix.*
+
+keil/r10cnn_a4bp.uvguix.zilia
+keil/r10cnn_a4bp.uvoptx
+keil/bin/*
+keil/Listings/*
+keil/JLinkLog.txt
