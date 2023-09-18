@@ -7,13 +7,8 @@ void r10_global_avg_pool2d(size_t layer_id, exe_config *config, r10_tensor* ifm,
     const size_t in_chan = ifm->shape[ifm->ndim-1];
     const float num_inv = 1.0f/(ifm->num_data/in_chan);
 
-    enum precision prec = config->EXE_PRECISION;
-
     begin = xTaskGetTickCount();
 
-    switch (prec)
-    {
-    case BINARY32:
         ifm->dataf = (float*)pvPortMalloc(ifm->num_data*sizeof(float));
         nvm_to_vm(ifm->dataf, ifm->num_data, ifm->nvm_start);
 
@@ -41,15 +36,6 @@ void r10_global_avg_pool2d(size_t layer_id, exe_config *config, r10_tensor* ifm,
             (config->EXE_MODE == VANILLA)){
             vPortFree(ifm->dataf);
         }
-    break;
-        
-    case BINARY16:
-    // TODO
-    break;
-        
-    default:
-    break;
-    }
 
     elapse = xTaskGetTickCount() - begin;
     am_util_stdio_printf("POOL Layer %ld: %ld\n", layer_id, elapse);

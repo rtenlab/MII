@@ -76,7 +76,7 @@ int _forward_propagation(struct exe_config *config, struct r10_tensor input_tens
     // am_util_stdio_printf("ADC Read: %.5fmV\n", adc_read());
   }
 
-  res_label = max_in_r10_tensor(config->EXE_PRECISION, &layer->ofm, layer->ofm.num_data);
+  res_label = max_in_r10_tensor(&layer->ofm, layer->ofm.num_data);
 
   return res_label;
 }

@@ -426,9 +426,9 @@
               <FilePath>..\src\a4p_hardware.c</FilePath>
             </File>
             <File>
-              <FileName>r10cnn_oneshot.c</FileName>
+              <FileName>r10cnn_prelim.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\r10cnn_oneshot.c</FilePath>
+              <FilePath>..\src\r10cnn_prelim.c</FilePath>
             </File>
           </Files>
         </Group>

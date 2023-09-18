@@ -120,23 +120,11 @@ size_t max_in_bin16_array(bin16* array, size_t size){
     return res;
 }
 
-size_t max_in_r10_tensor(enum precision prec, r10_tensor* r10tensor, size_t size){
+size_t max_in_r10_tensor(r10_tensor* r10tensor, size_t size){
 
     size_t res = 0;
 
-    switch (prec)
-    {
-        case BINARY16:
-        res = max_in_bin16_array(r10tensor->data_bin16, r10tensor->num_data);
-        break;
-        
-        case BINARY32:
-        res = max_in_float_array(r10tensor->dataf, r10tensor->num_data);
-        break;
-        
-        default:
-        break;
-    }
+    res = max_in_float_array(r10tensor->dataf, r10tensor->num_data);
 
     return res;
 }
@@ -145,8 +133,6 @@ void a4p_print_config(struct exe_config* config){
 
     am_util_stdio_printf("EXE_MODE 1-LAYER | 2-TILED..................%d\n", 
         config->EXE_MODE);
-    am_util_stdio_printf("EXE_PRECISION 0-BINARY32 | 1-BINARY16.......%d\n", 
-        config->EXE_PRECISION);
     am_util_stdio_printf("Period......................................%d\n", 
         config->T_ms);
 
@@ -160,30 +146,15 @@ void a4p_print_config(struct exe_config* config){
  * @A: input tensor. Overwritten with outputs.
  * @b: bias tensor.
  */
-void r10_bias_add(enum precision prec, r10_tensor* A, const r10_tensor* b) 
+void r10_bias_add(r10_tensor* A, const r10_tensor* b) 
 {
 
-    switch (prec)
-    {
-    case BINARY32:
+
         for (size_t i=0; i<A->num_data; i+=b->num_data) {
             for (size_t j=0; j<b->num_data; ++j) {
                 A->dataf[i+j] += b->dataf[j];
             }
         }
-    break;
-        
-    case BINARY16:
-        for (size_t i=0; i<A->num_data; i+=b->num_data) {
-            for (size_t j=0; j<b->num_data; ++j) {
-                A->data_bin16[i+j] += b->data_bin16[j];
-            }
-        }
-    break;
-        
-    default:
-    break;
-    }
 
     return;
 }

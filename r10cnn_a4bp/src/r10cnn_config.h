@@ -39,7 +39,7 @@ struct exe_config
 
     enum exe_mode EXE_MODE;
 
-    enum precision EXE_PRECISION;
+    // enum precision EXE_PRECISION;
 
     size_t T_ms; // period of the current task, in ms
     size_t D_ms; // deadline of the current task, in ms

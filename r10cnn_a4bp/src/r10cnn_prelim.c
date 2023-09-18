@@ -24,39 +24,22 @@ StackType_t xFooStack[ STACK_SIZE ];
 
 void FooTask(){
     TickType_t start, C_ticks;
-    // for(;;){
-        start = xTaskGetTickCount();
 
-        r10cnn_driver(&a4p_exp1_configs.configs[0], &r10cnn_inas_original, output0); // inas_original
-        // r10cnn_driver(&a4p_exp1_configs.configs[1], &r10cnn_inas_12, output1); // inas_12
-        // r10cnn_driver(&a4p_exp1_configs.configs[2], &r10cnn_mnist_inas, mnist_output0);
+    start = xTaskGetTickCount();
 
-        C_ticks = xTaskGetTickCount() - start;
+    r10cnn_driver(&a4p_exp1_configs.configs[0], &r10cnn_inas_original, output0); // inas_original
+    // r10cnn_driver(&a4p_exp1_configs.configs[1], &r10cnn_inas_12, output1); // inas_12
+    // r10cnn_driver(&a4p_exp1_configs.configs[2], &r10cnn_mnist_inas, mnist_output0);
 
-        am_util_stdio_printf("FooTask Ticks Difference: %ldms\n", C_ticks);
-//==================================<RTEN>============================================
-        if (0 != clear_exe_status()){
-            am_util_stdio_printf("FooTask: Error in clearing execution status\n");
-        }
-        
-        // am_hal_sysctrl_fpu_disable();
-        // am_bsp_uart_printf_disable();
+    C_ticks = xTaskGetTickCount() - start;
 
-        while(1);
-        /*
-        am_util_stdio_printf("Enterring Deep Sleep...\n");
-        while (1)
-        {
-            //
-            // Go to Deep Sleep until wakeup.
-            //
-            am_hal_sysctrl_sleep(AM_HAL_SYSCTRL_SLEEP_DEEP);
-        }
-        */
-        
-//=================================</RTEN>============================================
-        // vTaskDelay(a4p_exp1_configs.configs[0].T_ms / portTICK_PERIOD_MS);
-    // }
+    am_util_stdio_printf("FooTask Ticks Difference: %ldms\n", C_ticks);
+
+    if (0 != clear_exe_status()){
+        am_util_stdio_printf("FooTask: Error in clearing execution status\n");
+    }
+
+    while(1);
 }
 
 /**

@@ -4,13 +4,11 @@ void r10_idx2sub(const size_t idx, size_t * sub, const size_t * shape, const siz
 void _matmul_float(float * C, const float * A, const float * B, const size_t outrows,
                 const size_t outcols, const size_t innerdim);
 size_t r10_sub2idx(const size_t * sub, const size_t * shape, const size_t ndim);
-void r10_dot(enum precision prec,
-    r10_tensor* C, const r10_tensor* A, const r10_tensor* B, const size_t * axesA,
+void r10_dot(r10_tensor* C, const r10_tensor* A, const r10_tensor* B, const size_t * axesA,
     const size_t * axesB, const size_t naxes, const int normalize, r10_tensor* workspace);
-void r10_affine_matmul(enum precision prec,
-    r10_tensor* ofm, r10_tensor* ifm, r10_tensor* kernel, r10_tensor* bias,
+void r10_affine_matmul(r10_tensor* ofm, r10_tensor* ifm, r10_tensor* kernel, r10_tensor* bias,
     const size_t outrows,const size_t outcols, const size_t innerdim);
-void r10_softmax_func(enum precision prec, r10_tensor* r10tensor, const size_t size);
+void r10_softmax_func(r10_tensor* r10tensor, const size_t size);
 
 extern TickType_t begin, elapse;
 
@@ -96,8 +94,7 @@ size_t r10_sub2idx(const size_t * sub, const size_t * shape, const size_t ndim) 
  * :param normalize: (0,1) whether to L2-normalize samples along the dot product axis before taking the dot product. If set to 1, then the output of the dot product is the cosine proximity between the two samples.
  * :param fwork: array of working space, size(fwork) = size(A) + size(B)
  */
-void r10_dot(enum precision prec,
-    r10_tensor* C, const r10_tensor* A, const r10_tensor* B, const size_t * axesA,
+void r10_dot(r10_tensor* C, const r10_tensor* A, const r10_tensor* B, const size_t * axesA,
     const size_t * axesB, const size_t naxes, const int normalize, r10_tensor* workspace) {
 
     size_t permA[R10_MAX_NDIM];
@@ -181,69 +178,57 @@ void r10_dot(enum precision prec,
         newshpB[i] = B->shape[permB[i]];
     }
 
-    // switch begin
-    switch (prec)
-    {
-    case BINARY16:
-    // TODO
-    break;
-    case BINARY32:
-        fwork = workspace->dataf;
-        reshapeA = &fwork[0];   // temp working storage
-        reshapeB = &fwork[A->num_data];
-        // reshape arrays
-        for (size_t i=0; i<A->num_data; ++i) {
-            r10_idx2sub(i,Asub,A->shape,ndimA);
-            for (size_t j=0; j<ndimA; ++j) {
-                Bsub[j] = Asub[permA[j]];
-            }
-            size_t bidx = r10_sub2idx(Bsub,newshpA,ndimA);
-            reshapeA[bidx] = A->dataf[i];
+    fwork = workspace->dataf;
+    reshapeA = &fwork[0];   // temp working storage
+    reshapeB = &fwork[A->num_data];
+    // reshape arrays
+    for (size_t i=0; i<A->num_data; ++i) {
+        r10_idx2sub(i,Asub,A->shape,ndimA);
+        for (size_t j=0; j<ndimA; ++j) {
+            Bsub[j] = Asub[permA[j]];
         }
-
-        for (size_t i=0; i<B->num_data; ++i) {
-            r10_idx2sub(i,Bsub,B->shape,ndimB);
-            for (size_t j=0; j<ndimB; ++j) {
-                Asub[j] = Bsub[permB[j]];
-            }
-            size_t bidx = r10_sub2idx(Asub,newshpB,ndimB);
-            reshapeB[bidx] = B->dataf[i];
-        }
-
-
-        if (normalize) {
-
-            float sum;
-            float inorm;
-            for (size_t i=0; i<free_axesA; ++i) {
-                sum = 0;
-                for (size_t j=0; j<prod_axesA; ++j) {
-                    sum += reshapeA[i*prod_axesA + j]*reshapeA[i*prod_axesA + j];
-                }
-                inorm = 1.0f/sqrtf(sum);
-                for (size_t j=0; j<prod_axesA; ++j) {
-                    reshapeA[i*prod_axesA + j] *= inorm;
-                }
-            }
-            for (size_t i=0; i<free_axesB; ++i) {
-                sum = 0;
-                for (size_t j=0; j<prod_axesB; ++j) {
-                    sum += reshapeB[i + free_axesB*j]*reshapeB[i + free_axesB*j];
-                }
-                inorm = 1.0f/sqrtf(sum);
-                for (size_t j=0; j<prod_axesB; ++j) {
-                    reshapeB[i + free_axesB*j] *= inorm;
-                }
-            }
-        }
-
-        _matmul_float(C->dataf, reshapeA, reshapeB, free_axesA,
-                free_axesB, prod_axesA);
-    break;
-    
-    default:
-    break;
+        size_t bidx = r10_sub2idx(Bsub,newshpA,ndimA);
+        reshapeA[bidx] = A->dataf[i];
     }
+
+    for (size_t i=0; i<B->num_data; ++i) {
+        r10_idx2sub(i,Bsub,B->shape,ndimB);
+        for (size_t j=0; j<ndimB; ++j) {
+            Asub[j] = Bsub[permB[j]];
+        }
+        size_t bidx = r10_sub2idx(Asub,newshpB,ndimB);
+        reshapeB[bidx] = B->dataf[i];
+    }
+
+
+    if (normalize) {
+
+        float sum;
+        float inorm;
+        for (size_t i=0; i<free_axesA; ++i) {
+            sum = 0;
+            for (size_t j=0; j<prod_axesA; ++j) {
+                sum += reshapeA[i*prod_axesA + j]*reshapeA[i*prod_axesA + j];
+            }
+            inorm = 1.0f/sqrtf(sum);
+            for (size_t j=0; j<prod_axesA; ++j) {
+                reshapeA[i*prod_axesA + j] *= inorm;
+            }
+        }
+        for (size_t i=0; i<free_axesB; ++i) {
+            sum = 0;
+            for (size_t j=0; j<prod_axesB; ++j) {
+                sum += reshapeB[i + free_axesB*j]*reshapeB[i + free_axesB*j];
+            }
+            inorm = 1.0f/sqrtf(sum);
+            for (size_t j=0; j<prod_axesB; ++j) {
+                reshapeB[i + free_axesB*j] *= inorm;
+            }
+        }
+    }
+
+    _matmul_float(C->dataf, reshapeA, reshapeB, free_axesA,
+            free_axesB, prod_axesA);
 
     return;
 }
@@ -263,8 +248,7 @@ void r10_dot(enum precision prec,
  * :param innderdim: number of cols of A and rows of B
  * 
  */
-void r10_affine_matmul(enum precision prec,
-    r10_tensor* ofm, r10_tensor* ifm, r10_tensor* kernel, r10_tensor* bias,
+void r10_affine_matmul(r10_tensor* ofm, r10_tensor* ifm, r10_tensor* kernel, r10_tensor* bias,
     const size_t outrows,const size_t outcols, const size_t innerdim) {
 
     // float *C = ofm->dataf;
@@ -274,31 +258,20 @@ void r10_affine_matmul(enum precision prec,
     // make sure output is empty
     float temp, ifm_f, kernel_f;
 
-    switch (prec)
-    {
-    case BINARY16:
-    // TODO
-    break;
-    case BINARY32:
-        
-        // memset(ofm->dataf, 0, outrows*outcols*sizeof(ofm->dataf[0]));
+    // memset(ofm->dataf, 0, outrows*outcols*sizeof(ofm->dataf[0]));
 
-        for (size_t i = 0 ; i < outrows; ++i) {
-            const size_t outrowidx = i*outcols;
-            const size_t inneridx = i*innerdim;
-            for (size_t j = 0;  j < outcols; ++j) {
-                for (size_t k = 0; k < innerdim; ++k) {
-                    ofm->dataf[outrowidx+j] += ifm->dataf[inneridx+k] * kernel->dataf[k*outcols+j];
-                    // printf("HERE %ld\n", innerdim);
-                }
-                // BECAUSE THE d - bias is not defined in our scope
-                // printf("bias added: %f\n", d[j]);
-                ofm->dataf[outrowidx+j] += bias->dataf[j]; 
+    for (size_t i = 0 ; i < outrows; ++i) {
+        const size_t outrowidx = i*outcols;
+        const size_t inneridx = i*innerdim;
+        for (size_t j = 0;  j < outcols; ++j) {
+            for (size_t k = 0; k < innerdim; ++k) {
+                ofm->dataf[outrowidx+j] += ifm->dataf[inneridx+k] * kernel->dataf[k*outcols+j];
+                // printf("HERE %ld\n", innerdim);
             }
+            // BECAUSE THE d - bias is not defined in our scope
+            // printf("bias added: %f\n", d[j]);
+            ofm->dataf[outrowidx+j] += bias->dataf[j]; 
         }
-    break;
-    default:
-    break;
     }
 
     return;
@@ -314,44 +287,32 @@ void r10_affine_matmul(enum precision prec,
  * 
  * void r10_softmax_func(float * x, const size_t size);
  */
-void r10_softmax_func(enum precision prec, r10_tensor* r10tensor, const size_t size) {
+void r10_softmax_func(r10_tensor* r10tensor, const size_t size) {
 
     float xmax, sum, temp;
     bin16 xmax_bin16, sum_bin16;
     // bin32 temp = 0x0;
 
-    switch (prec)
-    {
-    case BINARY16:
-    // TODO
-    break;
-
-    case BINARY32:
-        xmax = r10tensor->dataf[0];
-        sum = 0;
-        for (size_t i=0; i < size; ++i) {
-            if (r10tensor->dataf[i]>xmax) {
-                xmax = r10tensor->dataf[i];
-            }
+    xmax = r10tensor->dataf[0];
+    sum = 0;
+    for (size_t i=0; i < size; ++i) {
+        if (r10tensor->dataf[i]>xmax) {
+            xmax = r10tensor->dataf[i];
         }
-
-        for (size_t i=0; i < size; ++i) {
-            r10tensor->dataf[i] = expf(r10tensor->dataf[i]-xmax);
-        }
-
-        for (size_t i=0; i < size; ++i) {
-            sum += r10tensor->dataf[i];
-        }
-
-        sum = 1.0f/sum;
-        for (size_t i=0; i < size; ++i) {
-            r10tensor->dataf[i] = r10tensor->dataf[i]*sum;
-        }
-    break;
-    default:
-    break;
     }
 
+    for (size_t i=0; i < size; ++i) {
+        r10tensor->dataf[i] = expf(r10tensor->dataf[i]-xmax);
+    }
+
+    for (size_t i=0; i < size; ++i) {
+        sum += r10tensor->dataf[i];
+    }
+
+    sum = 1.0f/sum;
+    for (size_t i=0; i < size; ++i) {
+        r10tensor->dataf[i] = r10tensor->dataf[i]*sum;
+    }
     
 
     return;
@@ -361,9 +322,6 @@ void r10_softmax_func(enum precision prec, r10_tensor* r10tensor, const size_t s
 void r10_dense(size_t layer_id, exe_config *config, r10_tensor* kernel, r10_tensor* bias, 
     r10_tensor* ifm, r10_tensor* ofm, r10_tensor* workspace)
 {
-
-    enum precision prec = config->EXE_PRECISION;
-
     begin = xTaskGetTickCount();
 
     ifm->dataf = (float*)pvPortMalloc(ifm->num_data*sizeof(float));
@@ -386,9 +344,9 @@ void r10_dense(size_t layer_id, exe_config *config, r10_tensor* kernel, r10_tens
 
         
         // ==============================================
-        r10_affine_matmul(prec, ofm,ifm,kernel,bias,
+        r10_affine_matmul(ofm,ifm,kernel,bias,
                         outrows,outcols,innerdim);
-        r10_softmax_func(prec, ofm,outsize);
+        r10_softmax_func(ofm,outsize);
         // ==============================================
         
     }
@@ -399,9 +357,9 @@ void r10_dense(size_t layer_id, exe_config *config, r10_tensor* kernel, r10_tens
         const int normalize = 0;
 
         // ==============================================
-        r10_dot(prec, ofm, ifm, kernel, axesA, axesB, naxes, normalize, workspace);
-        r10_bias_add(prec,ofm,bias);
-        r10_softmax_func(prec, ofm, ofm->num_data);
+        r10_dot(ofm, ifm, kernel, axesA, axesB, naxes, normalize, workspace);
+        r10_bias_add(ofm,bias);
+        r10_softmax_func(ofm, ofm->num_data);
         // ==============================================
     }
 

@@ -70,7 +70,7 @@ am_adc_isr(void)
 
     // am_util_stdio_printf("ADC READING: %f!\n", adc_voltage);
 
-/*
+#if defined(JIT_ENABLED)
     // To JIT <RTEN>
     if(adc_voltage < JIT_THD){
         am_util_stdio_printf("%f Below JIT! JIT kicks in Layer: %ld\n", adc_voltage, layer->layer_id);
@@ -125,7 +125,7 @@ am_adc_isr(void)
         while(1);
     }
     // END TO JIT </RTEN>
-*/
+#endif
 
 
     //
@@ -322,11 +322,6 @@ a4p_setup(void *pvParameters)
         
     am_util_stdio_terminal_clear();
 
-    // a4p_print_config(&config_inas_original);
-    // am_util_stdio_printf("\rSetup Complete - begin infernece\n\r");
-    // am_util_stdio_printf(" Use pin %d for input.\n", ADC_INPUT_PIN);
-    // am_util_stdio_printf(" The applied voltage should be between 0 and 1.1v.\n");
-
     //
     // Enable floating point.
     //
@@ -345,7 +340,7 @@ a4p_setup(void *pvParameters)
     //
     adc_init();
 
-/*
+#if defined(JIT_ENABLED)
     //
     // Enable interrupts for the ADC.
     //
@@ -358,7 +353,8 @@ a4p_setup(void *pvParameters)
     //
     am_hal_adc_sw_trigger(g_ADCHandle);
     // </RTEN>
-*/
+// */
+#endif
 
     //
     // Reset the sample count which will be incremented by the ISR.
