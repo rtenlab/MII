@@ -2,9 +2,9 @@
 #define EXP1_CONFIGS_H
 
 #if defined AM_PART_APOLLO4B || AM_PART_APOLLO4P
-#include "../r10cnn_a4bp/src/r10_cnn.h"
+#include "../../r10cnn_a4bp/src/r10_cnn.h"
 #else
-#include "../libr10cnn/r10_cnn.h"
+#include "../../libr10cnn/r10_cnn.h"
 #endif
 
 /*******************************************************************
@@ -13,14 +13,14 @@
  *******************************************************************/
 #pragma PERSISTENT(exp1_configs)
 struct exe_config exp1_configs[3] = {
-{ // inas_original
+{ // cifar10_7
     .MEM_MODE = NORMAL,
     // .MEM_MODE = XIP,
 
-    .EXE_MODE = TILED,
+    // .EXE_MODE = TILED,
     // .EXE_MODE = FILTER,
     // .EXE_MODE = LAYER,
-    // .EXE_MODE = VANILLA,
+    .EXE_MODE = VANILLA,
 
     .T_ms = 8000,
     .D_ms = 8000,
@@ -32,7 +32,7 @@ struct exe_config exp1_configs[3] = {
         0x00000000,  
         0x00000000} 
 },
-{ // inas_12
+{ // cifar10_12
     .MEM_MODE = NORMAL,
     // .MEM_MODE = XIP,
 
@@ -50,7 +50,7 @@ struct exe_config exp1_configs[3] = {
         0x00000000,  
         0x00000000} 
 },
-{ // config_mnist_inas
+{ // mnist_7
     .MEM_MODE = NORMAL,
     // .MEM_MODE = XIP,
 

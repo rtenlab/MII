@@ -261,8 +261,6 @@ int check_r10cnn(struct exe_config *config, struct r10cnn_model *r10cnn){
 uint32_t fp32_to_ui32(float n)
 {
     return (uint32_t)(*(uint32_t*)&n);
-    // uint32_t te;
-    // memcpy(&te, &inas_original_k0[0], sizeof(uint32_t));
 }
  
 float ui32_to_fp32(uint32_t n)

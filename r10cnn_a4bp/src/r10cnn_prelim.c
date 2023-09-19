@@ -1,8 +1,12 @@
-#include "../../r10cnn_zoo/inas_original_nvm.h"
-#include "../../r10cnn_zoo/inas_12_nvm.h"
-#include "../../r10cnn_zoo/mnist_inas_nvm.h"
+/*
+ * All Preliminary Tests are stored in r10cnn_zoo/tradeoff_prelim
+ */
 
-#include "../../r10cnn_zoo/exp1_configs.h"
+#include "../../r10cnn_zoo/tradeoff_prelim/CIFAR10_7.h"
+#include "../../r10cnn_zoo/tradeoff_prelim/CIFAR10_12.h"
+#include "../../r10cnn_zoo/tradeoff_prelim/MNIST_7.h"
+
+#include "../../r10cnn_zoo/tradeoff_prelim/exp1_configs.h"
 
 #include "r10_cnn.h"
 
@@ -27,9 +31,9 @@ void FooTask(){
 
     start = xTaskGetTickCount();
 
-    r10cnn_driver(&a4p_exp1_configs.configs[0], &r10cnn_inas_original, output0); // inas_original
-    // r10cnn_driver(&a4p_exp1_configs.configs[1], &r10cnn_inas_12, output1); // inas_12
-    // r10cnn_driver(&a4p_exp1_configs.configs[2], &r10cnn_mnist_inas, mnist_output0);
+    r10cnn_driver(&a4p_exp1_configs.configs[0], &r10cnn_cifar10_7, output0); // CIFAR10_7
+    // r10cnn_driver(&a4p_exp1_configs.configs[1], &r10cnn_cifar10_12, output1); // CIFAR10_12
+    // r10cnn_driver(&a4p_exp1_configs.configs[2], &r10cnn_mnist_7, mnist_output0); // MNIST_7
 
     C_ticks = xTaskGetTickCount() - start;
 
