@@ -31,9 +31,11 @@ void FooTask(){
 
     start = xTaskGetTickCount();
 
+    // <RTEN> The blelow 3 are mutually exclusive
     r10cnn_driver(&a4p_exp1_configs.configs[0], &r10cnn_cifar10_7, output0); // CIFAR10_7
     // r10cnn_driver(&a4p_exp1_configs.configs[1], &r10cnn_cifar10_12, output1); // CIFAR10_12
     // r10cnn_driver(&a4p_exp1_configs.configs[2], &r10cnn_mnist_7, mnist_output0); // MNIST_7
+    // </RTEN>
 
     C_ticks = xTaskGetTickCount() - start;
 
