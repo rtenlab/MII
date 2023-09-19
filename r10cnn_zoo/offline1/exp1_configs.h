@@ -14,14 +14,6 @@
 #pragma PERSISTENT(exp1_configs)
 struct exe_config exp1_configs[3] = {
 { // cifar10_7
-    .MEM_MODE = NORMAL,
-    // .MEM_MODE = XIP,
-
-    // .EXE_MODE = TILED,
-    // .EXE_MODE = FILTER,
-    // .EXE_MODE = LAYER,
-    .EXE_MODE = VANILLA,
-
     .T_ms = 8000,
     .D_ms = 8000,
     .priority = 2,
@@ -33,13 +25,6 @@ struct exe_config exp1_configs[3] = {
         0x00000000} 
 },
 { // cifar10_12
-    .MEM_MODE = NORMAL,
-    // .MEM_MODE = XIP,
-
-    // .EXE_MODE = TILED,
-    .EXE_MODE = FILTER,
-    // .EXE_MODE = LAYER,
-    // .EXE_MODE = VANILLA,
     .T_ms = 15000,
     .D_ms = 15000,
     .priority = 1,
@@ -51,13 +36,6 @@ struct exe_config exp1_configs[3] = {
         0x00000000} 
 },
 { // mnist_7
-    .MEM_MODE = NORMAL,
-    // .MEM_MODE = XIP,
-
-    // .EXE_MODE = TILED,
-    // .EXE_MODE = FILTER,
-    // .EXE_MODE = LAYER,
-    .EXE_MODE = VANILLA,
     .T_ms = 6000,
     .D_ms = 6000,
     .priority = 3,

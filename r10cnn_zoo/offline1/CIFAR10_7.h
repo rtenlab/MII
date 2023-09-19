@@ -560,7 +560,7 @@ static float cifar10_7_fw6[44] = {0};
 r10cnn_layer cifar10_7[7] = {
 {
 	.mem = NORMAL,
-	.exe = VANILLA,
+	.exe = TILED,
 
 	.layer_id = 0,
 	.layer_f = CONV,
@@ -605,7 +605,7 @@ r10cnn_layer cifar10_7[7] = {
 }, // end layer CONV_0
 {
 	.mem = NORMAL,
-	.exe = VANILLA,
+	.exe = TILED,
 
 	.layer_id = 1,
 	.layer_f = CONV,
@@ -649,7 +649,7 @@ r10cnn_layer cifar10_7[7] = {
 }, // end layer CONV_1
 {
 	.mem = NORMAL,
-	.exe = VANILLA,
+	.exe = TILED,
 
 	.layer_id = 2,
 	.layer_f = CONV,
@@ -693,7 +693,7 @@ r10cnn_layer cifar10_7[7] = {
 }, // end layer CONV_2
 {
 	.mem = NORMAL,
-	.exe = VANILLA,
+	.exe = TILED,
 
 	.layer_id = 3,
 	.layer_f = CONV,
@@ -737,7 +737,7 @@ r10cnn_layer cifar10_7[7] = {
 }, // end layer CONV_3
 {
 	.mem = NORMAL,
-	.exe = FILTER,
+	.exe = TILED,
 
 	.layer_id = 4,
 	.layer_f = CONV,
@@ -781,7 +781,7 @@ r10cnn_layer cifar10_7[7] = {
 }, // end layer CONV_4
 {
 	.mem = NORMAL,
-	.exe = VANILLA,
+	.exe = TILED,
 
 	.layer_id = 5,
 	.layer_f = POOLING,
@@ -810,7 +810,7 @@ r10cnn_layer cifar10_7[7] = {
 }, // end layer GAVGPOOL_0
 {
 	.mem = NORMAL,
-	.exe = VANILLA,
+	.exe = TILED,
 	
 	.layer_id = 6,
 	.layer_f = CORE,
