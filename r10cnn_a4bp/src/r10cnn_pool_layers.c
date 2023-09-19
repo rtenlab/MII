@@ -7,7 +7,9 @@ void r10_global_avg_pool2d(size_t layer_id, exe_config *config, r10_tensor* ifm,
     const size_t in_chan = ifm->shape[ifm->ndim-1];
     const float num_inv = 1.0f/(ifm->num_data/in_chan);
 
+#if defined(UART_PROFILE)
     begin = xTaskGetTickCount();
+#endif
 
         ifm->dataf = (float*)pvPortMalloc(ifm->num_data*sizeof(float));
         nvm_to_vm(ifm->dataf, ifm->num_data, ifm->nvm_start);
@@ -37,8 +39,10 @@ void r10_global_avg_pool2d(size_t layer_id, exe_config *config, r10_tensor* ifm,
             vPortFree(ifm->dataf);
         }
 
+#if defined(UART_PROFILE)
     elapse = xTaskGetTickCount() - begin;
     am_util_stdio_printf("POOL Layer %ld: %ld\n", layer_id, elapse);
+#endif
 
     return;
 }

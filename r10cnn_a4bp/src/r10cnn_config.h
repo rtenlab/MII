@@ -15,7 +15,6 @@ enum exe_mode
     LAYER = 1,
     TILED = 2,
     FILTER = 3,
-    SINGLE = 4
 };
 typedef enum exe_mode exe_mode;
 

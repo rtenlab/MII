@@ -1,12 +1,8 @@
-/*
- * All Preliminary Tests are stored in r10cnn_zoo/tradeoff_prelim
- */
+#include "../../r10cnn_zoo/offline1/CIFAR10_7.h"
+#include "../../r10cnn_zoo/offline1/CIFAR10_12.h"
+#include "../../r10cnn_zoo/offline1/MNIST_7.h"
 
-#include "../../r10cnn_zoo/tradeoff_prelim/CIFAR10_7.h"
-#include "../../r10cnn_zoo/tradeoff_prelim/CIFAR10_12.h"
-#include "../../r10cnn_zoo/tradeoff_prelim/MNIST_7.h"
-
-#include "../../r10cnn_zoo/tradeoff_prelim/exp1_configs.h"
+#include "../../r10cnn_zoo/offline1/exp1_configs.h"
 
 #include "r10_cnn.h"
 
@@ -27,9 +23,11 @@ the RTOS port. */
 StackType_t xFooStack[ STACK_SIZE ];
 
 void FooTask(){
-    TickType_t start, C_ticks;
 
+#if defined(UART_PROFILE)
+    TickType_t start, C_ticks;
     start = xTaskGetTickCount();
+#endif
 
     // <RTEN> The blelow 3 are mutually exclusive
     r10cnn_driver(&a4p_exp1_configs.configs[0], &r10cnn_cifar10_7, output0); // CIFAR10_7
@@ -37,9 +35,10 @@ void FooTask(){
     // r10cnn_driver(&a4p_exp1_configs.configs[2], &r10cnn_mnist_7, mnist_output0); // MNIST_7
     // </RTEN>
 
+#if defined(UART_PROFILE)
     C_ticks = xTaskGetTickCount() - start;
-
     am_util_stdio_printf("FooTask Ticks Difference: %ldms\n", C_ticks);
+#endif
 
     if (0 != clear_exe_status()){
         am_util_stdio_printf("FooTask: Error in clearing execution status\n");

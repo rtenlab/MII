@@ -322,7 +322,9 @@ void r10_softmax_func(r10_tensor* r10tensor, const size_t size) {
 void r10_dense(size_t layer_id, exe_config *config, r10_tensor* kernel, r10_tensor* bias, 
     r10_tensor* ifm, r10_tensor* ofm, r10_tensor* workspace)
 {
+#if defined(UART_PROFILE)
     begin = xTaskGetTickCount();
+#endif
 
     ifm->dataf = (float*)pvPortMalloc(ifm->num_data*sizeof(float));
     nvm_to_vm(ifm->dataf, ifm->num_data, ifm->nvm_start);
@@ -367,8 +369,10 @@ void r10_dense(size_t layer_id, exe_config *config, r10_tensor* kernel, r10_tens
         am_util_stdio_printf("ERROR! vm_to_nvm return non-zero\n");
     }
 
+#if defined(UART_PROFILE)
     elapse = xTaskGetTickCount() - begin;
     am_util_stdio_printf("DENSE Layer %ld: %ld\n", layer_id, elapse);
+#endif
     
     return;
 }

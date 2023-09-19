@@ -1,1 +1,5 @@
 # MII
+
+flags:
+JIT_ENABLED
+UART_PROFILE

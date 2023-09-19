@@ -6,7 +6,10 @@ size_t tr, tc, tn, tm;
 
 extern float adc_voltage; // a4p_hardware.c
 extern int32_t counter; // r10_cnn.c
+
+#if defined(UART_PROFILE)
 extern TickType_t begin, elapse;
+#endif
 
 /**
  * ReLU activation function.
@@ -682,11 +685,15 @@ void _conv2d_layer (size_t layer_id, exe_config *config,
 
 void r10_conv2d (struct exe_config *config, struct r10cnn_layer *layer)
 {
+    // <MII>
+    enum exe_mode mode = layer->exe;
+    enum mem_mode mem = layer->mem;
+    // </MII>
 
-    enum exe_mode mode = config->EXE_MODE;
-    enum mem_mode mem = config->MEM_MODE;
-
+#if defined(UART_PROFILE)
     begin = xTaskGetTickCount();
+    am_util_stdio_printf("CONV%ld (V|L|T|F|S): %ld\n", layer->layer_id, mode);
+#endif
 
     if(mem==XIP)
     {
@@ -737,10 +744,10 @@ void r10_conv2d (struct exe_config *config, struct r10cnn_layer *layer)
 
     // am_util_stdio_printf("Counter: %d\n", counter); // REMOVE
 
+#if defined(UART_PROFILE)
     elapse = xTaskGetTickCount() - begin;
-
     am_util_stdio_printf("CONV Layer %ld: %ld\n", layer->layer_id, elapse);
-    
+#endif 
     return;
 
 }

@@ -559,6 +559,9 @@ static float cifar10_7_fw6[44] = {0};
 
 r10cnn_layer cifar10_7[7] = {
 {
+	.mem = NORMAL,
+	.exe = VANILLA,
+
 	.layer_id = 0,
 	.layer_f = CONV,
 	.conv_func = r10_conv2d, // Exclusive to conv2d
@@ -601,6 +604,9 @@ r10cnn_layer cifar10_7[7] = {
     }
 }, // end layer CONV_0
 {
+	.mem = NORMAL,
+	.exe = VANILLA,
+
 	.layer_id = 1,
 	.layer_f = CONV,
 	.conv_func = r10_conv2d, // Exclusive to conv2d
@@ -642,6 +648,9 @@ r10cnn_layer cifar10_7[7] = {
     }
 }, // end layer CONV_1
 {
+	.mem = NORMAL,
+	.exe = VANILLA,
+
 	.layer_id = 2,
 	.layer_f = CONV,
 	.conv_func = r10_conv2d, // Exclusive to conv2d
@@ -683,6 +692,9 @@ r10cnn_layer cifar10_7[7] = {
     }
 }, // end layer CONV_2
 {
+	.mem = NORMAL,
+	.exe = VANILLA,
+
 	.layer_id = 3,
 	.layer_f = CONV,
 	.conv_func = r10_conv2d, // Exclusive to conv2d
@@ -724,6 +736,9 @@ r10cnn_layer cifar10_7[7] = {
     }
 }, // end layer CONV_3
 {
+	.mem = NORMAL,
+	.exe = FILTER,
+
 	.layer_id = 4,
 	.layer_f = CONV,
 	.conv_func = r10_conv2d, // Exclusive to conv2d
@@ -765,6 +780,9 @@ r10cnn_layer cifar10_7[7] = {
     }
 }, // end layer CONV_4
 {
+	.mem = NORMAL,
+	.exe = VANILLA,
+
 	.layer_id = 5,
 	.layer_f = POOLING,
 	.pooling_func = r10_global_avg_pool2d, // Exclusive to r10_global_avg_pool2d
@@ -791,6 +809,9 @@ r10cnn_layer cifar10_7[7] = {
     }
 }, // end layer GAVGPOOL_0
 {
+	.mem = NORMAL,
+	.exe = VANILLA,
+	
 	.layer_id = 6,
 	.layer_f = CORE,
 	.core_func = r10_dense, // Exclusive to r10_dense

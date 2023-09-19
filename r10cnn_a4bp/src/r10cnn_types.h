@@ -109,6 +109,11 @@ typedef struct tiled_param tiled_param;
 
 struct r10cnn_layer
 {
+    // <MII>
+    enum mem_mode mem; // memory mode per layer
+    enum exe_mode exe; // execution mode per layer
+    // </MII>
+
     size_t layer_id;
     enum layer_func_flag layer_f;
 

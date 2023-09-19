@@ -239,9 +239,6 @@ int check_r10cnn(struct exe_config *config, struct r10cnn_model *r10cnn){
     if(config->EXE_MODE == VANILLA){
         am_util_stdio_printf("VANILLA: nothing in VANILLA r10cnn to be check\n");
     }
-    if (config->EXE_MODE == SINGLE){
-        am_util_stdio_printf("SINGLE: nothing in SINGLE r10cnn to be check\n");
-    }
     if (config->EXE_MODE == FILTER){
         am_util_stdio_printf("FILTER: nothing in FILTER r10cnn to be check\n");
     }

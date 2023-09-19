@@ -109,9 +109,9 @@ int r10cnn_driver(struct exe_config *config, struct r10cnn_model *r10cnn, float 
   if (config->exe_status[0] == 0x00000000){
     curr_label = max_in_float_array(out_array, 10);
     // am_util_stdio_terminal_clear();
-    am_util_stdio_printf("Correct Label: %ld\n", curr_label);
-    am_util_stdio_printf("MEM_MODE(Norm|XIP): %ld\n", config->MEM_MODE);
-    am_util_stdio_printf("EXE_MODE(V|L|T|F|S): %ld\n", config->EXE_MODE);
+    // am_util_stdio_printf("Correct Label: %ld\n", curr_label);
+    // am_util_stdio_printf("MEM_MODE(Norm|XIP): %ld\n", config->MEM_MODE);
+    // am_util_stdio_printf("EXE_MODE(V|L|T|F|S): %ld\n", config->EXE_MODE);
     config->exe_status[0] = 0x00000001; // indicate the inference commence by exe_status[0]=1
     config->exe_status[1] = curr_label; // store the correct label into exe_status[1]
     // config->exe_status[2] = 0; // reset layer_id to 0
