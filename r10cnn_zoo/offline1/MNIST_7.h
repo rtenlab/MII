@@ -177,7 +177,7 @@ static float fwork6[44] = {0};
 r10cnn_layer mnist_7[7] = {
 {
 	.mem = NORMAL,
-	.exe = VANILLA,
+	.exe = FILTER,
 	.layer_id = 0,
 	.layer_f = CONV,
 	.conv_func = r10_conv2d, // Exclusive to conv2d
@@ -186,7 +186,7 @@ r10cnn_layer mnist_7[7] = {
 	.ifm = (r10_tensor){
 		.nvm_start = 0x0011F370, 
 		.nvm_end = 0x0011FFAC,
-		.dataf = mnist_input0, // compatible with VANILLA
+		.dataf = mnist_input0, // compatible with TILED
 		.ndim = 3,
 		.num_data = 784,
 		.shape = {28,28,1,1,1}
@@ -221,7 +221,7 @@ r10cnn_layer mnist_7[7] = {
 }, // end layer CONV0
 {
 	.mem = NORMAL,
-	.exe = VANILLA,
+	.exe = FILTER,
 	.layer_id = 1,
 	.layer_f = CONV,
 	.conv_func = r10_conv2d, // Exclusive to conv2d
@@ -264,7 +264,7 @@ r10cnn_layer mnist_7[7] = {
 }, // end layer CONV1
 {
 	.mem = NORMAL,
-	.exe = VANILLA,
+	.exe = FILTER,
 	.layer_id = 2,
 	.layer_f = CONV,
 	.conv_func = r10_conv2d, // Exclusive to conv2d
@@ -307,7 +307,7 @@ r10cnn_layer mnist_7[7] = {
 }, // end layer CONV2
 {
 	.mem = NORMAL,
-	.exe = VANILLA,
+	.exe = FILTER,
 	.layer_id = 3,
 	.layer_f = CONV,
 	.conv_func = r10_conv2d, // Exclusive to conv2d
@@ -393,7 +393,7 @@ r10cnn_layer mnist_7[7] = {
 }, // end layer CONV4
 {
 	.mem = NORMAL,
-	.exe = VANILLA,
+	.exe = FILTER,
 	.layer_id = 5,
 	.layer_f = POOLING,
 	.pooling_func = r10_global_avg_pool2d, // Exclusive to r10_global_avg_pool2d
@@ -424,7 +424,7 @@ r10cnn_layer mnist_7[7] = {
 }, // end layer GAVGPOOL0
 {
 	.mem = NORMAL,
-	.exe = VANILLA,
+	.exe = FILTER,
 	.layer_id = 6,
 	.layer_f = CORE,
 	.core_func = r10_dense, // Exclusive to r10_dense

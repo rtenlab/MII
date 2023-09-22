@@ -21,7 +21,8 @@ float g_fTrims[4];
 // init above JIT thd to avoid startup shutdown
 float adc_voltage = 10000.0f;
 
-#define JIT_THD 3300 // mV 
+#define JIT_THD 3500 // mV 
+#define END_LAYER_ID 100 // TODO: must match the num_layers-1 of the running DNN
 
 extern struct r10cnn_layer *layer;
 extern size_t x0, x1, z0, z1, q, k;
@@ -72,7 +73,7 @@ am_adc_isr(void)
 
 #if defined(JIT_ENABLED)
     // To JIT <RTEN>
-    if(adc_voltage < JIT_THD  && layer->exe == VANILLA){
+    if(adc_voltage < JIT_THD  && layer->exe == VANILLA && layer->layer_id != END_LAYER_ID){
         am_util_stdio_printf("%f Below JIT! JIT kicks in Layer: %ld\n", adc_voltage, layer->layer_id);
         // curr_exe_status[2] = (uint32_t)layer->layer_id+1; // store the correct label into exe_status[1]
         // am_hal_mram_info_program(AM_HAL_MRAM_INFO_KEY,
@@ -340,7 +341,7 @@ a4p_setup(void *pvParameters)
     //
     adc_init();
 
-// #if defined(JIT_ENABLED)
+#if defined(JIT_ENABLED)
     //
     // Enable interrupts for the ADC.
     //
@@ -353,7 +354,7 @@ a4p_setup(void *pvParameters)
     //
     am_hal_adc_sw_trigger(g_ADCHandle);
     // </RTEN>
-// #endif
+#endif
 
     //
     // Reset the sample count which will be incremented by the ISR.

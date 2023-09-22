@@ -1,6 +1,7 @@
 #include "r10_cnn.h"
 
 extern TickType_t begin, elapse;
+extern struct r10cnn_layer *layer;
 
 void r10_global_avg_pool2d(size_t layer_id, exe_config *config, r10_tensor* ifm, r10_tensor* ofm)
 {
@@ -35,7 +36,7 @@ void r10_global_avg_pool2d(size_t layer_id, exe_config *config, r10_tensor* ifm,
         }
 
         if (layer_id > 0 && 
-            (config->EXE_MODE == VANILLA)){
+            (layer->exe == VANILLA)){
             vPortFree(ifm->dataf);
         }
 
