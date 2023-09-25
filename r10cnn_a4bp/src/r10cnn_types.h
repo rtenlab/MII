@@ -11,9 +11,18 @@ enum layer_func_flag
 {
     CONV = 1,
     POOLING = 2,
-    CORE = 3
+    CORE = 3,
+    NORM = 4,
+    ADD = 5
 };
 typedef enum layer_func_flag layer_func_flag;
+enum dnn_type
+{
+    R10CNN = 1,
+    RESNETV1 = 2, // resnet for CIFAR10
+    AD = 3 // Anaomaly Detecion
+};
+typedef enum dnn_type dnn_type;
 
 
 /*******************************************************************
@@ -120,6 +129,9 @@ struct r10cnn_layer
     void (*conv_func)
     (struct exe_config *config, struct r10cnn_layer *layer);
 
+    void (*norm_func)
+    (struct exe_config *config, struct r10cnn_layer *layer);
+
     void (*pooling_func)
     (size_t layer_id, exe_config *config,
     r10_tensor* ifm, r10_tensor* ofm);
@@ -156,6 +168,8 @@ struct r10cnn_model
     r10cnn_layer *layers;
 
     char model_name[MAX_MODEL_NAME];
+
+    enum dnn_type dnn;
 };
 typedef struct r10cnn_model r10cnn_model;
 

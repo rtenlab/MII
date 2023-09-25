@@ -1108,6 +1108,7 @@ r10cnn_layer cifar10_12[12] = {
 r10cnn_model r10cnn_cifar10_12={
 	.num_layers = 12,
 	.layers = cifar10_12,
-	.model_name = "cifar10_12"
+	.model_name = "cifar10_12",
+	.dnn = R10CNN
 };
 #endif /* CIFAR10_12_H */

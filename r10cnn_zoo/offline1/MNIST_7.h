@@ -482,6 +482,7 @@ r10cnn_layer mnist_7[7] = {
 r10cnn_model r10cnn_mnist_7={
 	.num_layers = 7,
 	.layers = mnist_7,
-	.model_name = "mnist_7"
+	.model_name = "mnist_7",
+	.dnn = R10CNN
 };
 #endif /* MNIST_7_H */

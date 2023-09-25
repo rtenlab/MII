@@ -863,8 +863,9 @@ r10cnn_layer cifar10_7[7] = {
 
 #pragma PERSISTENT(r10cnn_cifar10_7)
 r10cnn_model r10cnn_cifar10_7={
-	.num_layers = 7,
+	.num_layers = 37,
 	.layers = cifar10_7,
-	.model_name = "cifar10_7"
+	.model_name = "cifar10_7",
+	.dnn = R10CNN
 };
 #endif /* CIFAR10_7_H */

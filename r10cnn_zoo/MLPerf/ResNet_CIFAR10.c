@@ -16016,93 +16016,95 @@ float dense_fwork[704] = {0};
 
  
 k2c_pad2d(&conv2d_padded_input,input_1_input,conv2d_fill, 
-	conv2d_pad); 
+	conv2d_pad); //0
 k2c_conv2d(&conv2d_output,&conv2d_padded_input,&conv2d_kernel, 
-	&conv2d_bias,conv2d_stride,conv2d_dilation,k2c_linear); 
-k2c_batch_norm(&batch_normalization_output,&conv2d_output,&batch_normalization_mean,&batch_normalization_stdev,&batch_normalization_gamma,&batch_normalization_beta,batch_normalization_axis); 
-k2c_relu(batch_normalization_output.array,batch_normalization_output.numel); 
+	&conv2d_bias,conv2d_stride,conv2d_dilation,k2c_linear); //1
+k2c_batch_norm(&batch_normalization_output,&conv2d_output,&batch_normalization_mean,&batch_normalization_stdev,&batch_normalization_gamma,&batch_normalization_beta,batch_normalization_axis); //2
+k2c_relu(batch_normalization_output.array,batch_normalization_output.numel); //3
 k2c_tensor activation_output; 
 activation_output.ndim = batch_normalization_output.ndim; // copy data into output struct 
 activation_output.numel = batch_normalization_output.numel; 
 memcpy(activation_output.shape,batch_normalization_output.shape,K2C_MAX_NDIM*sizeof(size_t));  
-activation_output.array = &batch_normalization_output.array[0]; // rename for clarity 
+activation_output.array = &batch_normalization_output.array[0]; // rename for clarity
 k2c_pad2d(&conv2d_1_padded_input,&activation_output,conv2d_1_fill, 
-	conv2d_1_pad); 
+	conv2d_1_pad); //4
 k2c_conv2d(&conv2d_1_output,&conv2d_1_padded_input,&conv2d_1_kernel, 
-	&conv2d_1_bias,conv2d_1_stride,conv2d_1_dilation,k2c_linear); 
-k2c_batch_norm(&batch_normalization_1_output,&conv2d_1_output,&batch_normalization_1_mean,&batch_normalization_1_stdev,&batch_normalization_1_gamma,&batch_normalization_1_beta,batch_normalization_1_axis); 
-k2c_relu(batch_normalization_1_output.array,batch_normalization_1_output.numel); 
+	&conv2d_1_bias,conv2d_1_stride,conv2d_1_dilation,k2c_linear); //5
+k2c_batch_norm(&batch_normalization_1_output,&conv2d_1_output,&batch_normalization_1_mean,&batch_normalization_1_stdev,&batch_normalization_1_gamma,&batch_normalization_1_beta,batch_normalization_1_axis); //6 
+k2c_relu(batch_normalization_1_output.array,batch_normalization_1_output.numel); //7
 k2c_tensor activation_1_output; 
 activation_1_output.ndim = batch_normalization_1_output.ndim; // copy data into output struct 
 activation_1_output.numel = batch_normalization_1_output.numel; 
 memcpy(activation_1_output.shape,batch_normalization_1_output.shape,K2C_MAX_NDIM*sizeof(size_t));  
 activation_1_output.array = &batch_normalization_1_output.array[0]; // rename for clarity 
 k2c_pad2d(&conv2d_2_padded_input,&activation_1_output,conv2d_2_fill, 
-	conv2d_2_pad); 
+	conv2d_2_pad); //8
 k2c_conv2d(&conv2d_2_output,&conv2d_2_padded_input,&conv2d_2_kernel, 
 	&conv2d_2_bias,conv2d_2_stride,conv2d_2_dilation,k2c_linear); 
 k2c_batch_norm(&batch_normalization_2_output,&conv2d_2_output,&batch_normalization_2_mean,&batch_normalization_2_stdev,&batch_normalization_2_gamma,&batch_normalization_2_beta,batch_normalization_2_axis); 
-k2c_add(&add_output,add_num_tensors0,&activation_output,&batch_normalization_2_output); 
-k2c_relu(add_output.array,add_output.numel); 
+k2c_add(&add_output,add_num_tensors0,&activation_output,&batch_normalization_2_output); // 11
+k2c_relu(add_output.array,add_output.numel); //12
 k2c_tensor activation_2_output; 
 activation_2_output.ndim = add_output.ndim; // copy data into output struct 
 activation_2_output.numel = add_output.numel; 
 memcpy(activation_2_output.shape,add_output.shape,K2C_MAX_NDIM*sizeof(size_t));  
 activation_2_output.array = &add_output.array[0]; // rename for clarity 
 k2c_pad2d(&conv2d_3_padded_input,&activation_2_output,conv2d_3_fill, 
-	conv2d_3_pad); 
+	conv2d_3_pad); //13
 k2c_conv2d(&conv2d_3_output,&conv2d_3_padded_input,&conv2d_3_kernel, 
-	&conv2d_3_bias,conv2d_3_stride,conv2d_3_dilation,k2c_linear); 
+	&conv2d_3_bias,conv2d_3_stride,conv2d_3_dilation,k2c_linear); //14
 k2c_batch_norm(&batch_normalization_3_output,&conv2d_3_output,&batch_normalization_3_mean,&batch_normalization_3_stdev,&batch_normalization_3_gamma,&batch_normalization_3_beta,batch_normalization_3_axis); 
-k2c_relu(batch_normalization_3_output.array,batch_normalization_3_output.numel); 
+k2c_relu(batch_normalization_3_output.array,batch_normalization_3_output.numel); //16
 k2c_tensor activation_3_output; 
 activation_3_output.ndim = batch_normalization_3_output.ndim; // copy data into output struct 
 activation_3_output.numel = batch_normalization_3_output.numel; 
 memcpy(activation_3_output.shape,batch_normalization_3_output.shape,K2C_MAX_NDIM*sizeof(size_t));  
 activation_3_output.array = &batch_normalization_3_output.array[0]; // rename for clarity 
 k2c_pad2d(&conv2d_4_padded_input,&activation_3_output,conv2d_4_fill, 
-	conv2d_4_pad); 
+	conv2d_4_pad); //17
 k2c_conv2d(&conv2d_4_output,&conv2d_4_padded_input,&conv2d_4_kernel, 
-	&conv2d_4_bias,conv2d_4_stride,conv2d_4_dilation,k2c_linear); 
+	&conv2d_4_bias,conv2d_4_stride,conv2d_4_dilation,k2c_linear); //18
 k2c_pad2d(&conv2d_5_padded_input,&activation_2_output,conv2d_5_fill, 
-	conv2d_5_pad); 
+	conv2d_5_pad); //19
 k2c_conv2d(&conv2d_5_output,&conv2d_5_padded_input,&conv2d_5_kernel, 
-	&conv2d_5_bias,conv2d_5_stride,conv2d_5_dilation,k2c_linear); 
+	&conv2d_5_bias,conv2d_5_stride,conv2d_5_dilation,k2c_linear); //20
 k2c_batch_norm(&batch_normalization_4_output,&conv2d_4_output,&batch_normalization_4_mean,&batch_normalization_4_stdev,&batch_normalization_4_gamma,&batch_normalization_4_beta,batch_normalization_4_axis); 
-k2c_add(&add_1_output,add_1_num_tensors0,&conv2d_5_output,&batch_normalization_4_output); 
-k2c_relu(add_1_output.array,add_1_output.numel); 
+k2c_add(&add_1_output,add_1_num_tensors0,&conv2d_5_output,&batch_normalization_4_output); //22
+k2c_relu(add_1_output.array,add_1_output.numel); //23
 k2c_tensor activation_4_output; 
 activation_4_output.ndim = add_1_output.ndim; // copy data into output struct 
 activation_4_output.numel = add_1_output.numel; 
 memcpy(activation_4_output.shape,add_1_output.shape,K2C_MAX_NDIM*sizeof(size_t));  
 activation_4_output.array = &add_1_output.array[0]; // rename for clarity 
 k2c_pad2d(&conv2d_6_padded_input,&activation_4_output,conv2d_6_fill, 
-	conv2d_6_pad); 
+	conv2d_6_pad); //24
 k2c_conv2d(&conv2d_6_output,&conv2d_6_padded_input,&conv2d_6_kernel, 
 	&conv2d_6_bias,conv2d_6_stride,conv2d_6_dilation,k2c_linear); 
 k2c_batch_norm(&batch_normalization_5_output,&conv2d_6_output,&batch_normalization_5_mean,&batch_normalization_5_stdev,&batch_normalization_5_gamma,&batch_normalization_5_beta,batch_normalization_5_axis); 
-k2c_relu(batch_normalization_5_output.array,batch_normalization_5_output.numel); 
+k2c_relu(batch_normalization_5_output.array,batch_normalization_5_output.numel); //27
 k2c_tensor activation_5_output; 
 activation_5_output.ndim = batch_normalization_5_output.ndim; // copy data into output struct 
 activation_5_output.numel = batch_normalization_5_output.numel; 
 memcpy(activation_5_output.shape,batch_normalization_5_output.shape,K2C_MAX_NDIM*sizeof(size_t));  
 activation_5_output.array = &batch_normalization_5_output.array[0]; // rename for clarity 
 k2c_pad2d(&conv2d_7_padded_input,&activation_5_output,conv2d_7_fill, 
-	conv2d_7_pad); 
+	conv2d_7_pad); //28
 k2c_conv2d(&conv2d_7_output,&conv2d_7_padded_input,&conv2d_7_kernel, 
-	&conv2d_7_bias,conv2d_7_stride,conv2d_7_dilation,k2c_linear); 
+	&conv2d_7_bias,conv2d_7_stride,conv2d_7_dilation,k2c_linear); //29
 k2c_pad2d(&conv2d_8_padded_input,&activation_4_output,conv2d_8_fill, 
-	conv2d_8_pad); 
+	conv2d_8_pad); //30
 k2c_conv2d(&conv2d_8_output,&conv2d_8_padded_input,&conv2d_8_kernel, 
-	&conv2d_8_bias,conv2d_8_stride,conv2d_8_dilation,k2c_linear); 
+	&conv2d_8_bias,conv2d_8_stride,conv2d_8_dilation,k2c_linear); //31
+
 k2c_batch_norm(&batch_normalization_6_output,&conv2d_7_output,&batch_normalization_6_mean,&batch_normalization_6_stdev,&batch_normalization_6_gamma,&batch_normalization_6_beta,batch_normalization_6_axis); 
 k2c_add(&add_2_output,add_2_num_tensors0,&conv2d_8_output,&batch_normalization_6_output); 
-k2c_relu(add_2_output.array,add_2_output.numel); 
+k2c_relu(add_2_output.array,add_2_output.numel); //34
 k2c_tensor activation_6_output; 
 activation_6_output.ndim = add_2_output.ndim; // copy data into output struct 
 activation_6_output.numel = add_2_output.numel; 
 memcpy(activation_6_output.shape,add_2_output.shape,K2C_MAX_NDIM*sizeof(size_t));  
 activation_6_output.array = &add_2_output.array[0]; // rename for clarity 
+
 k2c_avgpool2d(&average_pooling2d_output,&activation_6_output,average_pooling2d_pool_size, 
 	average_pooling2d_stride); 
 k2c_flatten(&flatten_output,&average_pooling2d_output); 

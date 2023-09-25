@@ -2,6 +2,8 @@
 #include "../../r10cnn_zoo/offline1/CIFAR10_12.h"
 #include "../../r10cnn_zoo/offline1/MNIST_7.h"
 
+#include "../../r10cnn_zoo/MLPerf/resnetv1.h"
+
 #include "../../r10cnn_zoo/offline1/exp1_configs.h"
 
 #include "r10_cnn.h"
@@ -32,8 +34,10 @@ void InferenceTask(){
 
         // <RTEN> The blelow 3 are mutually exclusive
         // r10cnn_driver(&a4p_exp1_configs.configs[0], &r10cnn_cifar10_7, output0); // CIFAR10_7
-        r10cnn_driver(&a4p_exp1_configs.configs[1], &r10cnn_cifar10_12, output1); // CIFAR10_12
+        // r10cnn_driver(&a4p_exp1_configs.configs[1], &r10cnn_cifar10_12, output1); // CIFAR10_12
         // r10cnn_driver(&a4p_exp1_configs.configs[2], &r10cnn_mnist_7, mnist_output0); // MNIST_7
+        
+        r10cnn_driver(&a4p_exp1_configs.configs[1], &r10_resnetv1, resnetv1_output); // resnetv1
         // </RTEN>
     
         if (0 != clear_exe_status()){

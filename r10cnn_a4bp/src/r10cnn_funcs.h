@@ -21,6 +21,8 @@ int r10cnn_driver(struct exe_config *config,
  * r10cnn_conv_layers.c - CONV
  *******************************************************************/
 void r10_conv2d (struct exe_config *config, struct r10cnn_layer *layer);
+void r10_pad2d(struct exe_config *config, struct r10cnn_layer *layer);
+void r10_relu(struct exe_config *config, struct r10cnn_layer *layer);
 
 /*******************************************************************
  * r10cnn_pool_layers.c - POOLING
@@ -31,12 +33,18 @@ void r10_global_avg_pool2d(size_t layer_id,
 /*******************************************************************
  * r10cnn_core_layers.c - CORE
  *******************************************************************/
+void r10_add(r10_tensor* output, ...);
 void r10_dense(size_t layer_id, exe_config *config, r10_tensor* kernel, r10_tensor* bias, 
     r10_tensor* ifm, r10_tensor* ofm, r10_tensor* workspace);
 
 /*******************************************************************
  * r10cnn_rtos.c
  *******************************************************************/
+
+/*******************************************************************
+ * r10_norm_layers.c
+ *******************************************************************/
+void r10_batch_norm(struct exe_config *config, struct r10cnn_layer *layer);
 
 /*******************************************************************
  * r10cnn_utils.c
@@ -47,12 +55,10 @@ size_t get_max_size_tensor(struct r10cnn_model r10cnn);
 size_t max_in_float_array(float* array, size_t size);
 size_t max_in_bin16_array(bin16* array, size_t size);
 size_t max_in_r10_tensor(r10_tensor* r10tensor, size_t size);
-void a4p_print_config(struct exe_config* config);
 void r10_bias_add(r10_tensor* A, const r10_tensor* b);
 void a4p_print_float_array(float *pBuf, size_t size);
 void a4p_print_uint32t_array(uint32_t *pBuf, size_t size);
 int tile_valid(r10cnn_layer *layer);
-int check_r10cnn(struct exe_config *config, struct r10cnn_model *r10cnn);
 uint32_t fp32_to_ui32(float n);
 float ui32_to_fp32(uint32_t n);
 int vm_to_nvm(float* data, size_t num_data, uint32_t begin_address, uint32_t *end_address);

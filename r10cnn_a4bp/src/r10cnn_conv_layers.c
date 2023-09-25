@@ -31,6 +31,14 @@ void r10_relu_func(r10_tensor *r10tensor) {
     
 }
 
+void r10_relu(struct exe_config *config, struct r10cnn_layer *layer) {
+
+    r10_relu_func(&layer->ofm);
+
+    return;
+    
+}
+
 void float_relu_func(float *x, size_t size) {
     for (size_t i=0; i < size; ++i) {
         if (x[i] <= 0.0f) {
@@ -751,3 +759,59 @@ void r10_conv2d (struct exe_config *config, struct r10cnn_layer *layer)
     return;
 
 }
+
+/**
+ * 2D (spatial) Padding.
+ * Within CONV layers
+ */
+void r10_pad2d(struct exe_config *config, struct r10cnn_layer *layer)
+{
+    r10_tensor *input = &layer->ifm;
+    input->dataf = (float*)pvPortMalloc(input->num_data*sizeof(float));
+    nvm_to_vm(input->dataf, input->num_data, input->nvm_start);
+    r10_tensor *output = &layer->ofm;
+    output->dataf = (float*)pvPortMalloc(layer->ofm.num_data*sizeof(float));
+    memset(output->dataf,0,output->num_data*sizeof(output->dataf[0])); // clear the corrupted
+
+    // <RTEN> compatibility ad hoc
+    float fill = 0.0f; 
+    size_t pad[4] = {1,1,1,1}; 
+    // </RTEN>
+
+    const size_t in_height = input->shape[0];
+    const size_t in_width = input->shape[1];
+    const size_t in_channels = input->shape[2];
+    const size_t pad_top = pad[0];
+    const size_t pad_left = pad[2];
+    const size_t pad_right = pad[3];
+
+    // set output array to fill value
+    if (fabs(fill) < 1e-6) {
+        // fill is ~zero, use memset
+        memset(output->dataf,0,output->num_data*sizeof(output->dataf[0]));
+    }
+    else {
+        for(size_t i=0; i<output->num_data; ++i) {
+            output->dataf[i] = fill;
+        }
+    }
+    // memcpy the old array in the middle
+    size_t offset = in_channels*(pad_left+pad_right+in_width)*pad_top +
+                    in_channels*pad_left;
+    const size_t num = in_channels*in_width;
+    const size_t step = num+in_channels*(pad_left+pad_right);
+    for (size_t i=0; i<in_height; ++i) {
+        memcpy(&output->dataf[offset],
+               &input->dataf[i*num],
+               num*sizeof(input->dataf[0]));
+        offset += step;
+    }
+
+    if(vm_to_nvm(output->dataf, output->num_data, output->nvm_start, &output->nvm_end) != 0){
+        am_util_stdio_printf("ERROR! vm_to_nvm return non-zero\n");
+    }
+    vPortFree(output->dataf);
+    vPortFree(input->dataf);
+    return;
+}
+
