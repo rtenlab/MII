@@ -21,7 +21,7 @@ float g_fTrims[4];
 // init above JIT thd to avoid startup shutdown
 float adc_voltage = 10000.0f;
 
-#define JIT_THD 3500 // mV 
+#define JIT_THD 3300 // mV 
 #define END_LAYER_ID 100 // TODO: must match the num_layers-1 of the running DNN
 
 extern struct r10cnn_layer *layer;

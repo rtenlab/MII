@@ -647,7 +647,7 @@ r10cnn_layer resnetv1[37] = {
     .ifm = (r10_tensor){
         .nvm_start = 0x00119370,
         .nvm_end = 0x0011C36C,
-        .dataf = input0,
+        .dataf = resnetv1_input,
         .ndim = 3,
         .num_data = 3072,
         .shape = {32,32,3,1,1}
@@ -1730,7 +1730,7 @@ r10cnn_layer resnetv1[37] = {
 		.pad = 0,
 		.shape = {4,1,1,8,0} // {Tr, Tc, Tn, Tm, T5}
     }
-},
+}/*,
 {
 	.mem = NORMAL,
 	.exe = VANILLA,
@@ -1780,14 +1780,14 @@ r10cnn_layer resnetv1[37] = {
 		.pad = 0,
 		.shape = {10,1,1,1,0} // {Tr, Tc, Tn, Tm, T5}
     }
-} // end layer FC_END
+} // end layer FC_END*/
 };
 
 
 #pragma PERSISTENT(r10_resnetv1)
 r10cnn_model r10_resnetv1={
-    .num_layers = 7,
-    .layers = cifar10_7,
+    .num_layers = 37,
+    .layers = resnetv1,
     .model_name = "r10_resnetv1",
     .dnn = RESNETV1
 };

@@ -590,7 +590,7 @@ static float cifar10_12_fw11[176] = {0};
 r10cnn_layer cifar10_12[12] = {
 {
 	.mem = NORMAL,
-	.exe = TILED,
+	.exe = LAYER,
 	.layer_id = 0,
 	.layer_f = CONV,
 	.conv_func = r10_conv2d, // Exclusive to conv2d
@@ -634,7 +634,7 @@ r10cnn_layer cifar10_12[12] = {
 }, // end layer CONV_0
 {
 	.mem = NORMAL,
-	.exe = TILED,
+	.exe = LAYER,
 	.layer_id = 1,
 	.layer_f = CONV,
 	.conv_func = r10_conv2d, // Exclusive to conv2d
@@ -677,7 +677,7 @@ r10cnn_layer cifar10_12[12] = {
 }, // end layer CONV_1
 {
 	.mem = NORMAL,
-	.exe = TILED,
+	.exe = LAYER,
 	.layer_id = 2,
 	.layer_f = CONV,
 	.conv_func = r10_conv2d, // Exclusive to conv2d
@@ -720,7 +720,7 @@ r10cnn_layer cifar10_12[12] = {
 }, // end layer CONV_2
 {
 	.mem = NORMAL,
-	.exe = TILED,
+	.exe = LAYER,
 	.layer_id = 3,
 	.layer_f = CONV,
 	.conv_func = r10_conv2d, // Exclusive to conv2d
@@ -763,7 +763,7 @@ r10cnn_layer cifar10_12[12] = {
 }, // end layer CONV_3
 {
 	.mem = NORMAL,
-	.exe = TILED,
+	.exe = LAYER,
 	.layer_id = 4,
 	.layer_f = CONV,
 	.conv_func = r10_conv2d, // Exclusive to conv2d
@@ -806,7 +806,7 @@ r10cnn_layer cifar10_12[12] = {
 }, // end layer CONV_4
 {
 	.mem = NORMAL,
-	.exe = TILED,
+	.exe = LAYER,
 	.layer_id = 5,
 	.layer_f = CONV,
 	.conv_func = r10_conv2d, // Exclusive to conv2d
@@ -849,7 +849,7 @@ r10cnn_layer cifar10_12[12] = {
 }, // end layer CONV_5
 {
 	.mem = NORMAL,
-	.exe = TILED,
+	.exe = LAYER,
 	.layer_id = 6,
 	.layer_f = CONV,
 	.conv_func = r10_conv2d, // Exclusive to conv2d
@@ -892,7 +892,7 @@ r10cnn_layer cifar10_12[12] = {
 }, // end layer CONV_6
 {
 	.mem = NORMAL,
-	.exe = TILED,
+	.exe = LAYER,
 	.layer_id = 7,
 	.layer_f = CONV,
 	.conv_func = r10_conv2d, // Exclusive to conv2d
@@ -935,7 +935,7 @@ r10cnn_layer cifar10_12[12] = {
 }, // end layer CONV_7
 {
 	.mem = NORMAL,
-	.exe = TILED,
+	.exe = LAYER,
 	.layer_id = 8,
 	.layer_f = CONV,
 	.conv_func = r10_conv2d, // Exclusive to conv2d
@@ -978,7 +978,7 @@ r10cnn_layer cifar10_12[12] = {
 }, // end layer CONV_8
 {
 	.mem = NORMAL,
-	.exe = TILED,
+	.exe = LAYER,
 	.layer_id = 9,
 	.layer_f = CONV,
 	.conv_func = r10_conv2d, // Exclusive to conv2d
@@ -1021,7 +1021,7 @@ r10cnn_layer cifar10_12[12] = {
 }, // end layer CONV_9
 {
 	.mem = NORMAL,
-	.exe = TILED,
+	.exe = LAYER,
 	.layer_id = 10,
 	.layer_f = POOLING,
 	.pooling_func = r10_global_avg_pool2d, // Exclusive to r10_global_avg_pool2d
@@ -1052,7 +1052,7 @@ r10cnn_layer cifar10_12[12] = {
 }, // end layer GAVGPOOL_0
 {
 	.mem = NORMAL,
-	.exe = TILED,
+	.exe = LAYER,
 	.layer_id = 11,
 	.layer_f = CORE,
 	.core_func = r10_dense, // Exclusive to r10_dense
@@ -1075,7 +1075,8 @@ r10cnn_layer cifar10_12[12] = {
 		.shape = {10,1,1}
 	},
 	.weights = (r10_tensor){
-		.data_bin16 = 0,
+		.nvm_start = 0x00120000, // fake address
+		.nvm_end = 0x00000000,
 		.dataf = cifar10_12_k11,
 		.ndim = 2,
 		.num_data = 160,

@@ -339,7 +339,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>AM_PACKAGE_BGA  AM_FREERTOS AM_PART_APOLLO4P keil AM_UTIL_FAULTISR_PRINT UART_PROFILE</Define>
+              <Define>AM_PACKAGE_BGA  AM_FREERTOS AM_PART_APOLLO4P keil AM_UTIL_FAULTISR_PRINT JIT_ENABLED</Define>
               <Undefine></Undefine>
               <IncludePath>..\AmbiqSuite_R4.3.0;..\AmbiqSuite_R4.3.0\utils;..\AmbiqSuite_R4.3.0\CMSIS\ARM\Include;..\AmbiqSuite_R4.3.0\mcu\apollo4p;..\AmbiqSuite_R4.3.0\CMSIS\AmbiqMicro\Include;..\AmbiqSuite_R4.3.0\boards\apollo4p_evb\bsp;..\src;..\AmbiqSuite_R4.3.0\devices;..\src\r10_FreeRTOS\Source\include;..\src\r10_FreeRTOS\Source\portable\Keil6\AMapollo4</IncludePath>
             </VariousControls>

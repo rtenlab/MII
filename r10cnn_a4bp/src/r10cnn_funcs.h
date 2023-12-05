@@ -23,6 +23,7 @@ int r10cnn_driver(struct exe_config *config,
 void r10_conv2d (struct exe_config *config, struct r10cnn_layer *layer);
 void r10_pad2d(struct exe_config *config, struct r10cnn_layer *layer);
 void r10_relu(struct exe_config *config, struct r10cnn_layer *layer);
+void r10_conv1d(struct exe_config *config, struct r10cnn_layer *layer);
 
 /*******************************************************************
  * r10cnn_pool_layers.c - POOLING

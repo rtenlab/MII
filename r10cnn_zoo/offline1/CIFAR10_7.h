@@ -560,7 +560,7 @@ static float cifar10_7_fw6[44] = {0};
 r10cnn_layer cifar10_7[7] = {
 {
 	.mem = NORMAL,
-	.exe = VANILLA,
+	.exe = TILED,
 
 	.layer_id = 0,
 	.layer_f = CONV,
@@ -605,7 +605,7 @@ r10cnn_layer cifar10_7[7] = {
 }, // end layer CONV_0
 {
 	.mem = NORMAL,
-	.exe = VANILLA,
+	.exe = TILED,
 
 	.layer_id = 1,
 	.layer_f = CONV,
@@ -649,7 +649,7 @@ r10cnn_layer cifar10_7[7] = {
 }, // end layer CONV_1
 {
 	.mem = NORMAL,
-	.exe = VANILLA,
+	.exe = TILED,
 
 	.layer_id = 2,
 	.layer_f = CONV,
@@ -693,7 +693,7 @@ r10cnn_layer cifar10_7[7] = {
 }, // end layer CONV_2
 {
 	.mem = NORMAL,
-	.exe = VANILLA,
+	.exe = TILED,
 
 	.layer_id = 3,
 	.layer_f = CONV,
@@ -737,7 +737,7 @@ r10cnn_layer cifar10_7[7] = {
 }, // end layer CONV_3
 {
 	.mem = NORMAL,
-	.exe = FILTER,
+	.exe = TILED,
 
 	.layer_id = 4,
 	.layer_f = CONV,
@@ -781,7 +781,7 @@ r10cnn_layer cifar10_7[7] = {
 }, // end layer CONV_4
 {
 	.mem = NORMAL,
-	.exe = VANILLA,
+	.exe = TILED,
 
 	.layer_id = 5,
 	.layer_f = POOLING,
@@ -810,7 +810,7 @@ r10cnn_layer cifar10_7[7] = {
 }, // end layer GAVGPOOL_0
 {
 	.mem = NORMAL,
-	.exe = VANILLA,
+	.exe = TILED,
 	
 	.layer_id = 6,
 	.layer_f = CORE,
@@ -832,7 +832,8 @@ r10cnn_layer cifar10_7[7] = {
 		.shape = {10,1,1}
 	},
 	.weights = (r10_tensor){
-		.data_bin16 = 0,
+		.nvm_start = 0x00120000, // fake address
+		.nvm_end = 0x00000000,
 		.dataf = cifar10_7_k6,
 		.ndim = 2,
 		.num_data = 40,
@@ -863,7 +864,7 @@ r10cnn_layer cifar10_7[7] = {
 
 #pragma PERSISTENT(r10cnn_cifar10_7)
 r10cnn_model r10cnn_cifar10_7={
-	.num_layers = 37,
+	.num_layers = 7,
 	.layers = cifar10_7,
 	.model_name = "cifar10_7",
 	.dnn = R10CNN

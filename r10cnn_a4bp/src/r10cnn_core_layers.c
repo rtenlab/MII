@@ -347,6 +347,7 @@ void r10_dense(size_t layer_id, exe_config *config, r10_tensor* kernel, r10_tens
 
     ifm->dataf = (float*)pvPortMalloc(ifm->num_data*sizeof(float));
     nvm_to_vm(ifm->dataf, ifm->num_data, ifm->nvm_start);
+	
     // kernel->dataf = (float*)pvPortMalloc(kernel->num_data*sizeof(float));
     // nvm_to_vm(kernel->dataf, kernel->num_data, kernel->nvm_start);
 
@@ -392,6 +393,9 @@ void r10_dense(size_t layer_id, exe_config *config, r10_tensor* kernel, r10_tens
     elapse = xTaskGetTickCount() - begin;
     am_util_stdio_printf("DENSE Layer %ld: %ld\n", layer_id, elapse);
 #endif
+
+    // vPortFree(ifm->dataf);
+    // vPortFree(kernel->dataf);
     
     return;
 }
