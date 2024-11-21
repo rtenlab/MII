@@ -6,7 +6,10 @@ size_t tr, tc, tn, tm;
 
 extern float adc_voltage; // a4p_hardware.c
 extern int32_t counter; // r10_cnn.c
+
+#if defined(UART_PROFILE)
 extern TickType_t begin, elapse;
+#endif
 
 /**
  * ReLU activation function.
@@ -24,6 +27,15 @@ void r10_relu_func(r10_tensor *r10tensor) {
         }
     }
 
+    return;
+    
+}
+
+void r10_relu(struct exe_config *config, struct r10cnn_layer *layer) {
+    layer->ofm.dataf = (float*)pvPortMalloc(layer->ofm.num_data*sizeof(float));
+    memset(layer->ofm.dataf,0, layer->ofm.num_data*sizeof(layer->ofm.dataf[0]));
+    r10_relu_func(&layer->ofm);
+    vPortFree(layer->ifm.dataf);
     return;
     
 }
@@ -682,11 +694,15 @@ void _conv2d_layer (size_t layer_id, exe_config *config,
 
 void r10_conv2d (struct exe_config *config, struct r10cnn_layer *layer)
 {
+    // <MII>
+    enum exe_mode mode = layer->exe;
+    enum mem_mode mem = layer->mem;
+    // </MII>
 
-    enum exe_mode mode = config->EXE_MODE;
-    enum mem_mode mem = config->MEM_MODE;
-
+#if defined(UART_PROFILE)
     begin = xTaskGetTickCount();
+    am_util_stdio_printf("CONV%ld (V|L|T|F|S): %ld\n", layer->layer_id, mode);
+#endif
 
     if(mem==XIP)
     {
@@ -737,10 +753,194 @@ void r10_conv2d (struct exe_config *config, struct r10cnn_layer *layer)
 
     // am_util_stdio_printf("Counter: %d\n", counter); // REMOVE
 
+#if defined(UART_PROFILE)
     elapse = xTaskGetTickCount() - begin;
-
     am_util_stdio_printf("CONV Layer %ld: %ld\n", layer->layer_id, elapse);
-    
+#endif 
     return;
 
+}
+
+/**
+ * 2D (spatial) Padding.
+ * Within CONV layers
+ */
+void r10_pad2d(struct exe_config *config, struct r10cnn_layer *layer)
+{
+    r10_tensor *input = &layer->ifm;
+    input->dataf = (float*)pvPortMalloc(input->num_data*sizeof(float));
+    nvm_to_vm(input->dataf, input->num_data, input->nvm_start);
+    r10_tensor *output = &layer->ofm;
+    output->dataf = (float*)pvPortMalloc(layer->ofm.num_data*sizeof(float));
+    memset(output->dataf,0,output->num_data*sizeof(output->dataf[0])); // clear the corrupted
+
+    // <RTEN> compatibility ad hoc
+    float fill = 0.0f; 
+    size_t pad[4] = {1,1,1,1}; 
+    // </RTEN>
+
+    const size_t in_height = input->shape[0];
+    const size_t in_width = input->shape[1];
+    const size_t in_channels = input->shape[2];
+    const size_t pad_top = pad[0];
+    const size_t pad_left = pad[2];
+    const size_t pad_right = pad[3];
+
+    // set output array to fill value
+    if (fabs(fill) < 1e-6) {
+        // fill is ~zero, use memset
+        memset(output->dataf,0,output->num_data*sizeof(output->dataf[0]));
+    }
+    else {
+        for(size_t i=0; i<output->num_data; ++i) {
+            output->dataf[i] = fill;
+        }
+    }
+    // memcpy the old array in the middle
+    size_t offset = in_channels*(pad_left+pad_right+in_width)*pad_top +
+                    in_channels*pad_left;
+    const size_t num = in_channels*in_width;
+    const size_t step = num+in_channels*(pad_left+pad_right);
+    for (size_t i=0; i<in_height; ++i) {
+        memcpy(&output->dataf[offset],
+               &input->dataf[i*num],
+               num*sizeof(input->dataf[0]));
+        offset += step;
+    }
+
+    if(vm_to_nvm(output->dataf, output->num_data, output->nvm_start, &output->nvm_end) != 0){
+        am_util_stdio_printf("ERROR! vm_to_nvm return non-zero\n");
+    }
+    vPortFree(output->dataf);
+    vPortFree(input->dataf);
+    return;
+}
+
+
+
+void _conv1d_layer (size_t layer_id, exe_config *config,
+    const size_t stride[2], const size_t dilation[2],
+    r10_tensor* weights, const r10_tensor* bias, 
+    r10_tensor* input, r10_tensor* output){
+
+    input->dataf = (float*)pvPortMalloc(input->num_data*sizeof(float));
+    nvm_to_vm(input->dataf, input->num_data, input->nvm_start);
+    weights->dataf = (float*)pvPortMalloc(weights->num_data*sizeof(float));
+    nvm_to_vm(weights->dataf, weights->num_data, weights->nvm_start);
+
+    output->dataf = (float*)pvPortMalloc(output->num_data*sizeof(float));
+    memset(output->dataf,0,output->num_data*sizeof(output->dataf[0]));
+
+    memset(output->dataf,0,output->num_data*sizeof(output->dataf[0]));
+
+    const size_t out_times = output->shape[0];
+    const size_t out_channels = output->shape[1];
+    const size_t in_channels = input->shape[1];
+
+    for (size_t x0=0; x0 < out_times; ++x0) {
+        for (size_t z=0; z < weights->shape[0]; ++z) {
+            for (size_t q=0; q < in_channels; ++q) {
+                for (size_t k=0; k < out_channels; ++k) {
+                    output->dataf[x0*out_channels + k] +=
+                        weights->dataf[z*(weights->shape[2]*weights->shape[1]) +
+                                q*(weights->shape[2]) + k]
+                        *
+                        input->dataf[(x0*stride[0] + dilation[0]*z)*in_channels + q];
+                }
+            }
+        }
+    }
+    r10_bias_add(output,bias);
+    r10_relu_func(output);
+
+    if(vm_to_nvm(output->dataf, output->num_data, output->nvm_start, &output->nvm_end) != 0){
+        am_util_stdio_printf("ERROR! vm_to_nvm return non-zero\n");
+    }
+
+    vPortFree(output->dataf);
+    vPortFree(input->dataf);
+    vPortFree(weights->dataf);
+
+    return;
+
+}
+
+/**
+ * 1D (temporal) Convolution.
+ * Assumes a "channels last" structure.
+ *
+ * :param output: output tensor.
+ * :param input: input tensor.
+ * :param kernel: kernel tensor.
+ * :param bias: bias tensor.
+ * :param stride: stride length of the convolution.
+ * :param dilation: dilation rate to use for dilated convolution.
+ * :param activation: activation function to apply to output.
+ */
+void r10_conv1d(struct exe_config *config, struct r10cnn_layer *layer) {
+
+    // <MII>
+    enum exe_mode mode = layer->exe;
+    enum mem_mode mem = layer->mem;
+    // </MII>
+
+#if defined(UART_PROFILE)
+    begin = xTaskGetTickCount();
+    am_util_stdio_printf("CONV%ld (V|L|T|F|S): %ld\n", layer->layer_id, mode);
+#endif
+
+if(mem==XIP)
+    {
+        switch (mode)
+        {
+        // case VANILLA:
+        //     _conv1d_vanilla_xip(layer->layer_id, config, layer->stride, layer->dilation, &layer->weights, &layer->bias, &layer->ifm, &layer->ofm);
+        // break;
+        // case TILED:
+        //     _conv1d_tiled_xip(layer->layer_id, config, layer->stride, layer->dilation, &layer->t_param, &layer->weights, &layer->bias, &layer->ifm, &layer->ofm);
+        // break;
+        // case FILTER:
+        //     _conv1d_filter_xip(layer->layer_id, config, layer->stride, layer->dilation, &layer->weights, &layer->bias, &layer->ifm, &layer->ofm);
+        // break;
+        // case LAYER:
+        //     _conv1d_layer_xip(layer->layer_id, config, layer->stride, layer->dilation, &layer->weights, &layer->bias, &layer->ifm, &layer->ofm);
+        // break;
+        default:
+            am_util_stdio_printf("ERROR: Invalid mode for conv1d\n");
+        break;
+        }
+    }
+    else if (mem==NORMAL)
+    {
+        switch (mode)
+        {
+        // case VANILLA:
+        //     _conv1d_vanilla(layer->layer_id, config, layer->stride, layer->dilation, &layer->weights, &layer->bias, &layer->ifm, &layer->ofm);
+        // break;
+        // case TILED:
+        //     _conv1d_tiled(layer->layer_id, config, layer->stride, layer->dilation, &layer->t_param, &layer->weights, &layer->bias, &layer->ifm, &layer->ofm);
+        // break;
+        // case FILTER:
+        //     _conv1d_filter(layer->layer_id, config, layer->stride, layer->dilation, &layer->weights, &layer->bias, &layer->ifm, &layer->ofm);
+        // break;
+        case LAYER:
+            _conv1d_layer(layer->layer_id, config, layer->stride, layer->dilation, &layer->weights, &layer->bias, &layer->ifm, &layer->ofm);
+        break;
+        default:
+            am_util_stdio_printf("ERROR: Invalid mode for conv1d\n");
+        break;
+        }
+    }
+    else
+    {
+        am_util_stdio_printf("ERROR: Invalid memory mode for conv1d\n");
+    }
+
+    // am_util_stdio_printf("Counter: %d\n", counter); // REMOVE
+
+#if defined(UART_PROFILE)
+    elapse = xTaskGetTickCount() - begin;
+    am_util_stdio_printf("CONV Layer %ld: %ld\n", layer->layer_id, elapse);
+#endif 
+    return;
 }

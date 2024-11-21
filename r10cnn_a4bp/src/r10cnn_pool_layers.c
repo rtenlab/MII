@@ -1,13 +1,16 @@
 #include "r10_cnn.h"
 
 extern TickType_t begin, elapse;
+extern struct r10cnn_layer *layer;
 
 void r10_global_avg_pool2d(size_t layer_id, exe_config *config, r10_tensor* ifm, r10_tensor* ofm)
 {
     const size_t in_chan = ifm->shape[ifm->ndim-1];
     const float num_inv = 1.0f/(ifm->num_data/in_chan);
 
+#if defined(UART_PROFILE)
     begin = xTaskGetTickCount();
+#endif
 
         ifm->dataf = (float*)pvPortMalloc(ifm->num_data*sizeof(float));
         nvm_to_vm(ifm->dataf, ifm->num_data, ifm->nvm_start);
@@ -33,12 +36,14 @@ void r10_global_avg_pool2d(size_t layer_id, exe_config *config, r10_tensor* ifm,
         }
 
         if (layer_id > 0 && 
-            (config->EXE_MODE == VANILLA)){
+            (layer->exe == VANILLA)){
             vPortFree(ifm->dataf);
         }
 
+#if defined(UART_PROFILE)
     elapse = xTaskGetTickCount() - begin;
     am_util_stdio_printf("POOL Layer %ld: %ld\n", layer_id, elapse);
+#endif
 
     return;
 }

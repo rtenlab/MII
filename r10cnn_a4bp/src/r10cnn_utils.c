@@ -129,16 +129,6 @@ size_t max_in_r10_tensor(r10_tensor* r10tensor, size_t size){
     return res;
 }
 
-void a4p_print_config(struct exe_config* config){
-
-    am_util_stdio_printf("EXE_MODE 1-LAYER | 2-TILED..................%d\n", 
-        config->EXE_MODE);
-    am_util_stdio_printf("Period......................................%d\n", 
-        config->T_ms);
-
-    return;
-}
-
 /**
  * Adds bias vector b to tensor A.
  * assumes b is a rank 1 tensor that is added to the last dimension of A.
@@ -231,32 +221,29 @@ int tile_valid(r10cnn_layer *layer)
     return 0;
 }
 
-int check_r10cnn(struct exe_config *config, struct r10cnn_model *r10cnn){
-    struct r10cnn_layer *layer;
-    if(config->EXE_MODE == LAYER){
-        am_util_stdio_printf("LAYER: nothing in LAYER r10cnn to be check\n");
-    }
-    if(config->EXE_MODE == VANILLA){
-        am_util_stdio_printf("VANILLA: nothing in VANILLA r10cnn to be check\n");
-    }
-    if (config->EXE_MODE == SINGLE){
-        am_util_stdio_printf("SINGLE: nothing in SINGLE r10cnn to be check\n");
-    }
-    if (config->EXE_MODE == FILTER){
-        am_util_stdio_printf("FILTER: nothing in FILTER r10cnn to be check\n");
-    }
-    if(config->EXE_MODE == TILED){
-        for(size_t i=0;i<r10cnn->num_layers;i++){
-            layer = &r10cnn->layers[i];
-            if (tile_valid(layer) != 0){
-                am_util_stdio_printf("TILED: Tile size not matched to layer\n");
-                return 1;
-            }
-        }
-        am_util_stdio_printf("TILED: r10cnn Valid\n");
-    }
-    return 0;
-}
+// int check_r10cnn(struct exe_config *config, struct r10cnn_model *r10cnn){
+//     struct r10cnn_layer *layer;
+//     if(config->EXE_MODE == LAYER){
+//         am_util_stdio_printf("LAYER: nothing in LAYER r10cnn to be check\n");
+//     }
+//     if(config->EXE_MODE == VANILLA){
+//         am_util_stdio_printf("VANILLA: nothing in VANILLA r10cnn to be check\n");
+//     }
+//     if (config->EXE_MODE == FILTER){
+//         am_util_stdio_printf("FILTER: nothing in FILTER r10cnn to be check\n");
+//     }
+//     if(config->EXE_MODE == TILED){
+//         for(size_t i=0;i<r10cnn->num_layers;i++){
+//             layer = &r10cnn->layers[i];
+//             if (tile_valid(layer) != 0){
+//                 am_util_stdio_printf("TILED: Tile size not matched to layer\n");
+//                 return 1;
+//             }
+//         }
+//         am_util_stdio_printf("TILED: r10cnn Valid\n");
+//     }
+//     return 0;
+// }
 
 uint32_t fp32_to_ui32(float n)
 {

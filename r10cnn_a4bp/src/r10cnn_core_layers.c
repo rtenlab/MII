@@ -1,4 +1,5 @@
 #include "r10_cnn.h"
+#include <stdarg.h>
 
 void r10_idx2sub(const size_t idx, size_t * sub, const size_t * shape, const size_t ndim);
 void _matmul_float(float * C, const float * A, const float * B, const size_t outrows,
@@ -11,6 +12,24 @@ void r10_affine_matmul(r10_tensor* ofm, r10_tensor* ifm, r10_tensor* kernel, r10
 void r10_softmax_func(r10_tensor* r10tensor, const size_t size);
 
 extern TickType_t begin, elapse;
+
+void r10_add(r10_tensor* output,...) {
+
+    size_t num_tensors = 2; 
+
+    va_list args;
+    const r10_tensor *arrptr;
+    va_start (args, num_tensors);
+    memset(output->dataf, 0, output->num_data*sizeof(output->dataf[0]));
+
+    for (size_t i = 0; i < num_tensors; ++i) {
+        arrptr = va_arg(args, r10_tensor*);
+        for (size_t j=0; j<output->num_data; ++j) {
+            output->dataf[j] += arrptr->dataf[j];
+        }
+    }
+    va_end (args);
+}
 
 /**
  * Converts linear indices to subscripts in row major order.
@@ -322,10 +341,13 @@ void r10_softmax_func(r10_tensor* r10tensor, const size_t size) {
 void r10_dense(size_t layer_id, exe_config *config, r10_tensor* kernel, r10_tensor* bias, 
     r10_tensor* ifm, r10_tensor* ofm, r10_tensor* workspace)
 {
+#if defined(UART_PROFILE)
     begin = xTaskGetTickCount();
+#endif
 
     ifm->dataf = (float*)pvPortMalloc(ifm->num_data*sizeof(float));
     nvm_to_vm(ifm->dataf, ifm->num_data, ifm->nvm_start);
+	
     // kernel->dataf = (float*)pvPortMalloc(kernel->num_data*sizeof(float));
     // nvm_to_vm(kernel->dataf, kernel->num_data, kernel->nvm_start);
 
@@ -367,8 +389,13 @@ void r10_dense(size_t layer_id, exe_config *config, r10_tensor* kernel, r10_tens
         am_util_stdio_printf("ERROR! vm_to_nvm return non-zero\n");
     }
 
+#if defined(UART_PROFILE)
     elapse = xTaskGetTickCount() - begin;
     am_util_stdio_printf("DENSE Layer %ld: %ld\n", layer_id, elapse);
+#endif
+
+    // vPortFree(ifm->dataf);
+    // vPortFree(kernel->dataf);
     
     return;
 }

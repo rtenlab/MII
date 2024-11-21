@@ -81,6 +81,80 @@ int _forward_propagation(struct exe_config *config, struct r10_tensor input_tens
   return res_label;
 }
 
+int _resnetv1_inference(struct exe_config *config, struct r10_tensor input_tensor, struct r10cnn_model *r10cnn){
+  int res_label = -1;
+  size_t i;
+//==================================<RTEN>============================================
+  i = config->exe_status[2]; // readback layer_id
+//=================================</RTEN>============================================
+ for(;i<r10cnn->num_layers;i++){
+  // for(size_t i=0;i<5;i++){
+    layer = &r10cnn->layers[i];
+    
+    // layer function
+    switch (layer->layer_f)
+    {
+    case CONV:
+      layer ->conv_func(config, layer);
+    break;
+
+    case POOLING:
+      layer ->pooling_func(layer->layer_id, config,
+      &layer->ifm, &layer->ofm);
+    break;
+
+    case CORE:
+      layer ->core_func(layer->layer_id, config,
+      &layer->weights, &layer->bias, &layer->ifm, &layer->ofm,
+      &layer->workspace);
+    break;
+
+    case NORM:
+      layer ->norm_func(config, layer);
+    break;
+
+    case ADD:
+      r10_add(&layer->ofm,2,&r10cnn->layers[i-9].ofm, &layer->ifm);
+    break;
+    
+    default:
+      break;
+    }
+
+    // link the completed ofm to next ifm
+    if(layer->layer_id != r10cnn->num_layers-1){
+      r10cnn->layers[i+1].ifm = layer->ofm; // Volatile, lose after reboot
+    }
+    // if(layer->layer_id == 3 || layer->layer_id == 7) // execute the in-between connection
+    // {
+    //   r10_tensor activations;
+    //   activations.ndim = 3;
+    //   activations.num_data = 16384;
+    //   activations.shape = layer->ofm.shape;
+
+    // }
+
+    config->exe_status[2] = (uint32_t)i+1; // store the correct label into exe_status[1]
+    config->exe_status[3] = 0; // reset exe_status[3] to 0
+    config->exe_status[4] = 0; // reset exe_status[4] to 0
+    config->exe_status[5] = 0; // reset exe_status[3] to 0
+    config->exe_status[6] = 0; // reset exe_status[4] to 0
+    if(0 != am_hal_mram_info_program(AM_HAL_MRAM_INFO_KEY,
+      config->exe_status,
+      0,
+      (sizeof(config->exe_status) / sizeof(uint32_t))))
+    {
+        am_util_stdio_printf("ERROR! am_hal_mram_info_program return non-zero\n");
+    }
+
+    // am_util_stdio_printf("ADC Read: %.5fmV\n", adc_read());
+  }
+
+  res_label = max_in_r10_tensor(&layer->ofm, layer->ofm.num_data);
+
+  return res_label;
+}
+
 /**
  * r10cnn_drive - main r10cnn driver
  * @config: exe_config obtained from r10cnn_model header file
@@ -109,9 +183,9 @@ int r10cnn_driver(struct exe_config *config, struct r10cnn_model *r10cnn, float 
   if (config->exe_status[0] == 0x00000000){
     curr_label = max_in_float_array(out_array, 10);
     // am_util_stdio_terminal_clear();
-    am_util_stdio_printf("Correct Label: %ld\n", curr_label);
-    am_util_stdio_printf("MEM_MODE(Norm|XIP): %ld\n", config->MEM_MODE);
-    am_util_stdio_printf("EXE_MODE(V|L|T|F|S): %ld\n", config->EXE_MODE);
+    // am_util_stdio_printf("Correct Label: %ld\n", curr_label);
+    // am_util_stdio_printf("MEM_MODE(Norm|XIP): %ld\n", config->MEM_MODE);
+    // am_util_stdio_printf("EXE_MODE(V|L|T|F|S): %ld\n", config->EXE_MODE);
     config->exe_status[0] = 0x00000001; // indicate the inference commence by exe_status[0]=1
     config->exe_status[1] = curr_label; // store the correct label into exe_status[1]
     // config->exe_status[2] = 0; // reset layer_id to 0
@@ -131,7 +205,19 @@ int r10cnn_driver(struct exe_config *config, struct r10cnn_model *r10cnn, float 
 
   input_tensor = r10cnn->layers[0].ifm;
 
-  res_label = _forward_propagation(config, input_tensor, r10cnn);
+  switch (r10cnn->dnn)
+  {
+  case R10CNN:
+    res_label = _forward_propagation(config, input_tensor, r10cnn);
+    break;
+  case RESNETV1:
+    res_label = _resnetv1_inference(config, input_tensor, r10cnn);
+    break;
+  default:
+    am_util_stdio_printf("_layer_driver ERROR: DNN type not found");
+    break;
+  }
+  
   if(res_label == -1){
     am_util_stdio_printf("_layer_driver ERROR: _layer_forward_propagation return -1");
     return -1;
