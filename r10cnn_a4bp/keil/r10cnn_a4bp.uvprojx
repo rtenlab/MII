@@ -426,14 +426,14 @@
               <FilePath>..\src\a4p_hardware.c</FilePath>
             </File>
             <File>
-              <FileName>r10cnn_offline1.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\r10cnn_offline1.c</FilePath>
-            </File>
-            <File>
               <FileName>r10_norm_layers.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\r10_norm_layers.c</FilePath>
+            </File>
+            <File>
+              <FileName>r10cnn_offline1.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\r10cnn_offline1.c</FilePath>
             </File>
           </Files>
         </Group>
